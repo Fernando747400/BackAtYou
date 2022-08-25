@@ -14,6 +14,7 @@ namespace StarterAssets
 		public bool sprint;
 		public float scroll;
 		public bool shoot;
+		public bool teleport;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -51,6 +52,11 @@ namespace StarterAssets
 			ScrollInput(value.Get<float>());
 		}
 
+		public void OnTeleport(InputValue value)
+        {
+			TeleportInput(value.isPressed);
+        }
+
 		public void OnShoot(InputValue value)
         {
 			ShootInput(value.isPressed);
@@ -77,6 +83,11 @@ namespace StarterAssets
 		{
 			sprint = newSprintState;
 		}
+
+		public void TeleportInput(bool newTeleportState)
+        {
+			teleport = newTeleportState;
+        }
 
 		public void ShootInput(bool newShootState)
         {
