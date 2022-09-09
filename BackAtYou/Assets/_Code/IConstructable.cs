@@ -29,7 +29,7 @@ public interface IConstructable
         set;
     }
 
-    bool CanUpgrade
+    GameObject CurrentObject
     {
         get;
         set;
@@ -57,7 +57,8 @@ public interface IConstructable
 
     void Build(GameObject building, Vector3 position, Quaternion rotation)
     {
-        GameObject.Instantiate(building, position, rotation);
+        CurrentObject = GameObject.Instantiate(building, position, rotation);
+        CurrentObject.SetActive(true);
         IBuildEvent?.Invoke();
     }
 
@@ -77,8 +78,9 @@ public interface IConstructable
 
     void Upgrade(GameObject oldBuilding, GameObject newBuilding)
     {
-        oldBuilding.SetActive(false);
+        //oldBuilding.SetActive(false);
         Build(newBuilding, oldBuilding.transform.position, oldBuilding.transform.rotation);
+        GameObject.Destroy(oldBuilding);
         IUpgradeEvent?.Invoke();
     }
 

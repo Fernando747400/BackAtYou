@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Ghost
   Level: 0
-  Model: {fileID: 899428459418414007, guid: e5f4daf24146ee040b5a2d7a73b30aa0, type: 3}
+  Model: {fileID: 1335415992372505392, guid: 466621a4836aa504c87c15d88722d465, type: 3}
   HealthPool: 100
   UpgradeCost: 20

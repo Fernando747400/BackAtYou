@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class WallManager : MonoBehaviour
 {
     [Header("Dependencies")]
-    [SerializeField] private IConstructable _mywall;
+    [SerializeField] private Wall _mywallScript;
     [SerializeField] private WallScriptableObject _ghost;
     [SerializeField] private WallScriptableObject _basic;
     [SerializeField] private WallScriptableObject _upgradeOne;
@@ -13,8 +14,10 @@ public class WallManager : MonoBehaviour
 
     private List<WallScriptableObject> _wallsList = new List<WallScriptableObject>();
     private WallScriptableObject _currentWall;
-    private float _maxHealth;
-    private float _upgradePointsRequired;
+    private GameObject _currentWallObject;
+    private IConstructable _mywall;
+    private int _wallIndex;
+
 
     private void Start()
     {
@@ -33,33 +36,32 @@ public class WallManager : MonoBehaviour
             Debug.Log("Upgraded " + _mywall.UpgradePoints + " out of " + _mywall.UpgradePointsRequired);
         } else if (_mywall.CurrentHealth >= _mywall.MaxHealth && _mywall.UpgradePoints >= _mywall.UpgradePointsRequired)
         {
-            _mywall.Upgrade(_currentWall.Model, _wallsList[GetCurrentIndex() + 1].Model);
+            _mywall.Upgrade(_mywall.CurrentObject, _wallsList[GetCurrentIndex() + 1].Model);
             Debug.Log("Upgraded to new Model");
         }
     }
 
     public void UpgradeSuccess()
     {
+        ChangeCurrentWall();
+        NewWall(_currentWall);
         Debug.Log("You got upgraded");
     }
 
     private void NewWall(WallScriptableObject currentWall)
     {
-        _mywall.CurrentHealth = currentWall.HealthPool;
+        _mywall.CurrentHealth = currentWall.HealthPool / 2; //for testing only
+        //_mywall.CurrentHealth = currentWall.HealthPool;
         _mywall.MaxHealth = currentWall.HealthPool;
         _mywall.UpgradePoints = 0f;
         _mywall.UpgradePointsRequired = currentWall.UpgradeCost;
     }
 
-    private void ZeroValue(float valueToReset)
-    {
-        valueToReset = 0f;
-    }
-
-
     private void ChangeCurrentWall()
     {
-
+        _wallIndex++;
+        _currentWall = _wallsList[_wallIndex];
+        _currentWallObject = _mywall.CurrentObject;
     }
 
     private int GetCurrentIndex()
@@ -69,12 +71,15 @@ public class WallManager : MonoBehaviour
 
     private void Prepare()
     {
+        _mywall = _mywallScript.GetComponent<IConstructable>();
         _wallsList.Add(_ghost);
         _wallsList.Add(_basic);
         _wallsList.Add(_upgradeOne);
         _wallsList.Add(_upgradeTwo);
         _currentWall = _wallsList[0];
+        _wallIndex = 0;
         NewWall(_currentWall);
-        _mywall.Build(_currentWall.Model,Vector3.zero, Quaternion.identity);
+        _currentWallObject = _currentWall.Model;
+        _mywall.Build(_currentWallObject,Vector3.zero, Quaternion.identity);
     }
 }
