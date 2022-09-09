@@ -1,34 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 public interface IConstructable 
 {
-    GameObject Ghost
-    {
-        get;
-        set;
-    }
-
-    GameObject Basic
-    {
-        get;
-        set;
-    }
-
-    GameObject UpgradeOne
-    {
-        get;
-        set;
-    }
-
-    GameObject UpgardeTwo
-    {
-        get;
-        set;
-    }
 
     float CurrentHealth
     {
@@ -48,7 +23,7 @@ public interface IConstructable
         set;
     }
 
-    float UpgardePointsRequired
+    float UpgradePointsRequired
     {
         get;
         set;
@@ -60,47 +35,56 @@ public interface IConstructable
         set;
     }
 
-    UnityEvent BuildEvent
+    UnityEvent IBuildEvent
     {
         get;
-        set;
     }
 
-    UnityEvent RepairEvent
+    UnityEvent IRepairEvent
     {
         get;
-        set;
     }
 
-    UnityEvent UpgradeEvent
+    UnityEvent IUpgradePointsEvent
     {
         get;
-        set;
+    }
+
+    UnityEvent IUpgradeEvent
+    {
+        get;
     }
 
     void Build(GameObject building, Vector3 position, Quaternion rotation)
     {
         GameObject.Instantiate(building, position, rotation);
-        BuildEvent?.Invoke();
+        IBuildEvent?.Invoke();
     }
 
     void Repair(float repairValue)
     {
-        if (CurrentHealth <= MaxHealth) CurrentHealth += repairValue;
+        if (CurrentHealth < MaxHealth) CurrentHealth += repairValue;
         CurrentHealth = Math.Clamp(CurrentHealth, 0f, MaxHealth);
-        RepairEvent?.Invoke();
+        IRepairEvent?.Invoke();
+    }
+
+    void AddUpgradePoints(float pointsValue)
+    {
+        if (UpgradePoints < UpgradePointsRequired) UpgradePoints += pointsValue;
+        UpgradePoints = Mathf.Clamp(UpgradePoints, 0f, UpgradePointsRequired);
+        IUpgradePointsEvent?.Invoke();
     }
 
     void Upgrade(GameObject oldBuilding, GameObject newBuilding)
     {
         oldBuilding.SetActive(false);
         Build(newBuilding, oldBuilding.transform.position, oldBuilding.transform.rotation);
-        UpgradeEvent?.Invoke();
+        IUpgradeEvent?.Invoke();
     }
 
     void UpgradeMeshOnly(GameObject building, Mesh newMesh)
     {
         building.GetComponent<MeshFilter>().mesh = newMesh;
-        UpgradeEvent?.Invoke();
+        IUpgradeEvent?.Invoke();
     }
 }
